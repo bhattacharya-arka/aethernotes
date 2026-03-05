@@ -67,7 +67,6 @@ export function NoteEditor({ noteId }: Props) {
   };
 
   const handleContentChange = (v: string) => {
-    setContent(v);
     debouncedSaveContent(v);
   };
 

@@ -28,8 +28,14 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
     @Query(value = """
             SELECT n.* FROM notes n
             WHERE n.user_id = :userId
-              AND n.search_vector @@ plainto_tsquery('english', :query)
-            ORDER BY ts_rank(n.search_vector, plainto_tsquery('english', :query)) DESC,
+              AND (
+                n.search_vector @@ to_tsquery('english',
+                  regexp_replace(trim(:query), '\\s+', ':* & ', 'g') || ':*')
+                OR LOWER(n.title) LIKE LOWER(CONCAT('%', :query, '%'))
+              )
+            ORDER BY ts_rank(n.search_vector,
+                             to_tsquery('english',
+                               regexp_replace(trim(:query), '\\s+', ':* & ', 'g') || ':*')) DESC,
                      n.updated_at DESC
             LIMIT :limit
             """, nativeQuery = true)
