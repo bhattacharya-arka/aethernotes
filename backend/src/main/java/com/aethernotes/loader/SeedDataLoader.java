@@ -58,9 +58,14 @@ public class SeedDataLoader implements ApplicationRunner {
             return;
         }
 
+        // Always ensure the demo account exists — idempotent, runs on every startup.
+        // This guarantees a known-credential account regardless of DB state.
+        ensureDemoAccount();
+
         long existingUsers = userRepository.count();
-        if (existingUsers > 0) {
-            log.info("Database already seeded ({} users present). Skipping.", existingUsers);
+        if (existingUsers > 1) {
+            // More than just the demo account → bulk seed already ran, skip.
+            log.info("Database already seeded ({} users present). Skipping bulk seed.", existingUsers);
             return;
         }
 
@@ -73,6 +78,30 @@ public class SeedDataLoader implements ApplicationRunner {
         log.info("=== Seed complete: {} users, {} notes ===",
                 users.size(), (long) users.size() * NOTES_PER_USER);
         log.info("Login with any seeded user using password: {}", SEED_PASSWORD);
+    }
+
+    /**
+     * Creates a deterministic demo account so there is always a known email+password
+     * available for testing. Safe to call on every startup (no-op if already present).
+     */
+    private void ensureDemoAccount() {
+        if (userRepository.existsByEmail("demo@aethernotes.dev")) {
+            log.debug("Demo account already exists — skipping creation.");
+            return;
+        }
+        byte[] salt = encryptionService.generateSalt();
+        User demo = User.builder()
+                .username("demo")
+                .email("demo@aethernotes.dev")
+                .passwordHash(passwordEncoder.encode(SEED_PASSWORD))
+                .encryptionSalt(Base64.getEncoder().encodeToString(salt))
+                .build();
+        userRepository.save(demo);
+        log.info("========================================");
+        log.info("  Demo account ready:");
+        log.info("  Email   : demo@aethernotes.dev");
+        log.info("  Password: {}", SEED_PASSWORD);
+        log.info("========================================");
     }
 
     // ──────────────────────────────────────────────────────────────────────────
