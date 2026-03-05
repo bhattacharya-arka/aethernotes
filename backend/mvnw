@@ -1,0 +1,47 @@
+#!/bin/sh
+# Maven wrapper script
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.
+
+set -e
+
+# Find the maven wrapper jar
+MAVEN_WRAPPER_JAR_PATH="./.mvn/wrapper/maven-wrapper.jar"
+MAVEN_WRAPPER_PROPERTIES_PATH="./.mvn/wrapper/maven-wrapper.properties"
+
+if [ -r "$MAVEN_WRAPPER_JAR_PATH" ]; then
+    WRAPPER_JAR="$MAVEN_WRAPPER_JAR_PATH"
+fi
+
+# Determine Java executable
+if [ -n "$JAVA_HOME" ]; then
+    JAVA_EXEC="$JAVA_HOME/bin/java"
+else
+    JAVA_EXEC="java"
+fi
+
+# Read distribution URL from properties
+DISTRIBUTION_URL=$(grep -E "^distributionUrl=" "$MAVEN_WRAPPER_PROPERTIES_PATH" | sed 's/distributionUrl=//')
+MAVEN_HOME="$HOME/.m2/wrapper/dists"
+
+# Download Maven if not present
+MAVEN_DIST_NAME=$(basename "$DISTRIBUTION_URL" .zip)
+MAVEN_PATH="$MAVEN_HOME/$MAVEN_DIST_NAME"
+
+if [ ! -d "$MAVEN_PATH" ]; then
+    echo "Downloading Apache Maven..."
+    mkdir -p "$MAVEN_HOME"
+    TMP_ZIP="$MAVEN_HOME/maven-download.zip"
+    curl -fsSL "$DISTRIBUTION_URL" -o "$TMP_ZIP"
+    unzip -q "$TMP_ZIP" -d "$MAVEN_HOME"
+    rm "$TMP_ZIP"
+fi
+
+MAVEN_BIN=$(find "$MAVEN_HOME" -name "mvn" -path "*/bin/mvn" | head -1)
+
+if [ -z "$MAVEN_BIN" ]; then
+    echo "ERROR: Maven binary not found" >&2
+    exit 1
+fi
+
+exec "$MAVEN_BIN" "$@"

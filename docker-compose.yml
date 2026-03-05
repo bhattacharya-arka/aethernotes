@@ -1,0 +1,73 @@
+version: '3.9'
+
+# ─────────────────────────────────────────────────────────────
+# AetherNotes — Local Development Stack
+#
+# Services:
+#   postgres  – primary data store
+#   redis     – session keys, cache, token blacklist
+#
+# Start with:  docker compose up -d
+# Stop with:   docker compose down
+# Reset data:  docker compose down -v
+# ─────────────────────────────────────────────────────────────
+
+services:
+
+  # ── PostgreSQL ──────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: aethernotes-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB:-aethernotes}
+      POSTGRES_USER:     ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      PGDATA:            /var/lib/postgresql/data/pgdata
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-aethernotes}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - aethernotes-net
+
+  # ── Redis ───────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: aethernotes-redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --maxmemory      256mb
+      --maxmemory-policy allkeys-lru
+      --save           60 100
+      --loglevel       warning
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - aethernotes-net
+
+# ── Volumes ─────────────────────────────────────────────────
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+# ── Network ──────────────────────────────────────────────────
+networks:
+  aethernotes-net:
+    driver: bridge

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <rect width="1200" height="630" fill="#0a0a0f"/>
+
+  <!-- Background glow -->
+  <ellipse cx="600" cy="315" rx="400" ry="250" fill="#7c3aed" opacity="0.08"/>
+
+  <!-- Icon -->
+  <rect x="500" y="195" width="80" height="80" rx="20" fill="#7c3aed"/>
+  <path d="M518 228h24M518 240h36M518 252h20" stroke="white" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="562" cy="264" r="10" fill="#a78bfa" stroke="white" stroke-width="3"/>
+  <path d="M558 264l3 3 6-6" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Title -->
+  <text x="600" y="330" font-family="system-ui" font-size="56" font-weight="700" fill="white" text-anchor="middle" letter-spacing="-1">AetherNotes</text>
+  <text x="600" y="380" font-family="system-ui" font-size="22" fill="#9ca3af" text-anchor="middle">End-to-end encrypted note-taking platform</text>
+
+  <!-- Pills -->
+  <rect x="370" y="420" width="130" height="36" rx="18" fill="#7c3aed" opacity="0.3" stroke="#7c3aed" stroke-width="1"/>
+  <text x="435" y="443" font-family="system-ui" font-size="14" fill="#a78bfa" text-anchor="middle">AES-256-GCM</text>
+
+  <rect x="520" y="420" width="110" height="36" rx="18" fill="#7c3aed" opacity="0.3" stroke="#7c3aed" stroke-width="1"/>
+  <text x="575" y="443" font-family="system-ui" font-size="14" fill="#a78bfa" text-anchor="middle">Real-time</text>
+
+  <rect x="650" y="420" width="130" height="36" rx="18" fill="#7c3aed" opacity="0.3" stroke="#7c3aed" stroke-width="1"/>
+  <text x="715" y="443" font-family="system-ui" font-size="14" fill="#a78bfa" text-anchor="middle">Offline first</text>
+
+  <!-- Stack badges -->
+  <text x="600" y="535" font-family="system-ui" font-size="14" fill="#4b5563" text-anchor="middle">Spring Boot 3 · Next.js 14 · PostgreSQL · Redis</text>
+</svg>

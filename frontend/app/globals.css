@@ -1,0 +1,187 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────
+   CSS Design Tokens (ShadCN-compatible HSL variables)
+───────────────────────────────────────────────────────────── */
+@layer base {
+  :root {
+    --background:          0 0% 100%;
+    --foreground:          240 10% 3.9%;
+    --card:                0 0% 100%;
+    --card-foreground:     240 10% 3.9%;
+    --popover:             0 0% 100%;
+    --popover-foreground:  240 10% 3.9%;
+    --primary:             263 70% 60%;
+    --primary-foreground:  0 0% 100%;
+    --secondary:           240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted:               240 4.8% 95.9%;
+    --muted-foreground:    240 3.8% 46.1%;
+    --accent:              240 4.8% 95.9%;
+    --accent-foreground:   240 5.9% 10%;
+    --destructive:         0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border:              240 5.9% 90%;
+    --input:               240 5.9% 90%;
+    --ring:                263 70% 60%;
+    --radius:              0.5rem;
+
+    /* Sidebar */
+    --sidebar:             240 5% 96%;
+    --sidebar-foreground:  240 10% 3.9%;
+    --sidebar-border:      240 5.9% 90%;
+    --sidebar-accent:      240 4.8% 92%;
+
+    /* Editor */
+    --editor-bg:           0 0% 100%;
+
+    /* Font */
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  .dark {
+    --background:          240 10% 3.9%;
+    --foreground:          0 0% 95%;
+    --card:                240 10% 5%;
+    --card-foreground:     0 0% 95%;
+    --popover:             240 10% 5%;
+    --popover-foreground:  0 0% 95%;
+    --primary:             263 70% 65%;
+    --primary-foreground:  0 0% 100%;
+    --secondary:           240 3.7% 12%;
+    --secondary-foreground: 0 0% 95%;
+    --muted:               240 3.7% 14%;
+    --muted-foreground:    240 5% 55%;
+    --accent:              240 3.7% 14%;
+    --accent-foreground:   0 0% 95%;
+    --destructive:         0 62.8% 50.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border:              240 3.7% 15%;
+    --input:               240 3.7% 15%;
+    --ring:                263 70% 65%;
+
+    /* Sidebar */
+    --sidebar:             240 10% 5.5%;
+    --sidebar-foreground:  0 0% 90%;
+    --sidebar-border:      240 3.7% 12%;
+    --sidebar-accent:      240 3.7% 10%;
+
+    /* Editor */
+    --editor-bg:           240 10% 4.5%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/40;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TipTap Editor Styles
+───────────────────────────────────────────────────────────── */
+.ProseMirror {
+  outline: none;
+  min-height: calc(100vh - 140px);
+  padding: 0 0 4rem;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: hsl(var(--foreground));
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: hsl(var(--muted-foreground));
+  pointer-events: none;
+  float: left;
+  height: 0;
+}
+
+/* Typography inside editor */
+.ProseMirror h1 { @apply text-3xl font-bold mt-8 mb-3 tracking-tight; }
+.ProseMirror h2 { @apply text-2xl font-semibold mt-6 mb-2 tracking-tight; }
+.ProseMirror h3 { @apply text-xl font-semibold mt-5 mb-2; }
+
+.ProseMirror p  { @apply my-2; }
+
+.ProseMirror ul { @apply list-disc pl-6 my-3 space-y-1; }
+.ProseMirror ol { @apply list-decimal pl-6 my-3 space-y-1; }
+
+.ProseMirror blockquote {
+  @apply border-l-4 border-primary/40 pl-4 my-4 italic text-muted-foreground;
+}
+
+.ProseMirror code:not(pre code) {
+  @apply bg-muted text-primary rounded px-1.5 py-0.5 text-sm font-mono;
+}
+
+.ProseMirror pre {
+  @apply bg-muted rounded-lg p-4 my-4 overflow-x-auto;
+}
+
+.ProseMirror pre code {
+  @apply text-sm font-mono text-foreground;
+}
+
+.ProseMirror hr {
+  @apply border-border my-6;
+}
+
+.ProseMirror a {
+  @apply text-primary underline underline-offset-2 hover:opacity-80 transition-opacity;
+}
+
+/* Task list */
+.ProseMirror ul[data-type="taskList"] {
+  @apply list-none pl-0;
+}
+
+.ProseMirror ul[data-type="taskList"] li {
+  @apply flex items-start gap-2;
+}
+
+.ProseMirror ul[data-type="taskList"] li > label {
+  @apply flex-shrink-0 mt-0.5;
+}
+
+/* Selection */
+.ProseMirror ::selection {
+  background: hsl(var(--primary) / 0.2);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Utilities
+───────────────────────────────────────────────────────────── */
+.aether-sidebar-transition {
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.note-fade-in {
+  animation: fade-in 0.15s ease-out;
+}
