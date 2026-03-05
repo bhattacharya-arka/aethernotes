@@ -15,15 +15,25 @@ import type { Note } from '@/types';
 
 export function SearchModal() {
   const { searchOpen, closeSearch, setSelectedNote } = useStore();
-  const [query, setQuery] = useState('');
+  const [query, setQuery]               = useState('');
+  const [selectedIndex, setSelectedIndex] = useState(-1);
   const debouncedQ = useDebounce(query, 300);
   const inputRef   = useRef<HTMLInputElement>(null);
+  const itemRefs   = useRef<(HTMLButtonElement | null)[]>([]);
 
   const { data: results = [], isFetching } = useSearchNotes(debouncedQ);
 
+  // Reset selection when results change (new search)
+  useEffect(() => {
+    setSelectedIndex(-1);
+    itemRefs.current = [];
+  }, [results]);
+
+  // Reset state when modal opens
   useEffect(() => {
     if (searchOpen) {
       setQuery('');
+      setSelectedIndex(-1);
       setTimeout(() => inputRef.current?.focus(), 50);
     }
   }, [searchOpen]);
@@ -45,6 +55,29 @@ export function SearchModal() {
     closeSearch();
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (results.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex(prev => {
+        const next = Math.min(prev + 1, results.length - 1);
+        itemRefs.current[next]?.scrollIntoView({ block: 'nearest' });
+        return next;
+      });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex(prev => {
+        const next = Math.max(prev - 1, -1);
+        if (next >= 0) itemRefs.current[next]?.scrollIntoView({ block: 'nearest' });
+        return next;
+      });
+    } else if (e.key === 'Enter' && selectedIndex >= 0) {
+      e.preventDefault();
+      select(results[selectedIndex]);
+    }
+  };
+
   return (
     <Dialog open={searchOpen} onOpenChange={v => !v && closeSearch()}>
       <DialogContent className="p-0 max-w-xl gap-0 overflow-hidden">
@@ -55,6 +88,7 @@ export function SearchModal() {
             ref={inputRef}
             value={query}
             onChange={e => setQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="Search notes by title…"
             className="border-0 bg-transparent p-0 h-auto text-base focus-visible:ring-0 placeholder:text-muted-foreground/60"
           />
@@ -88,8 +122,15 @@ export function SearchModal() {
               <p className="text-xs text-muted-foreground px-2 pb-1">
                 {results.length} result{results.length !== 1 ? 's' : ''}
               </p>
-              {results.map(note => (
-                <SearchResult key={note.id} note={note} query={debouncedQ} onSelect={select} />
+              {results.map((note, i) => (
+                <SearchResult
+                  key={note.id}
+                  ref={el => { itemRefs.current[i] = el; }}
+                  note={note}
+                  query={debouncedQ}
+                  onSelect={select}
+                  isSelected={i === selectedIndex}
+                />
               ))}
             </div>
           )}
@@ -106,25 +147,30 @@ export function SearchModal() {
   );
 }
 
-function SearchResult({
-  note, query, onSelect,
-}: { note: Note; query: string; onSelect: (n: Note) => void }) {
+const SearchResult = React.forwardRef<
+  HTMLButtonElement,
+  { note: Note; query: string; onSelect: (n: Note) => void; isSelected: boolean }
+>(({ note, query, onSelect, isSelected }, ref) => {
   const preview = truncate(stripMarkdown(note.content ?? ''), 100);
 
   const highlight = (text: string) => {
     if (!query) return text;
-    const re  = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    const re    = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
     const parts = text.split(re);
     return parts.map((part, i) =>
-      re.test(part) ? <mark key={i} className="bg-primary/20 text-primary rounded px-0.5">{part}</mark> : part,
+      re.test(part)
+        ? <mark key={i} className="bg-primary/20 text-primary rounded px-0.5">{part}</mark>
+        : part,
     );
   };
 
   return (
     <button
+      ref={ref}
       onClick={() => onSelect(note)}
       className={cn(
         'w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-accent group',
+        isSelected && 'bg-accent',
       )}
     >
       <p className="text-sm font-medium truncate">{highlight(note.title ?? 'Untitled')}</p>
@@ -137,4 +183,5 @@ function SearchResult({
       </div>
     </button>
   );
-}
+});
+SearchResult.displayName = 'SearchResult';
