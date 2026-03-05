@@ -188,7 +188,7 @@ public class SeedDataLoader implements ApplicationRunner {
                 "TODO: " + faker.lorem().sentence(3),
                 faker.book().title(),
                 "Notes on " + faker.educator().course(),
-                faker.hacker().phrase(),
+                faker.lorem().sentence(),
         };
         return templates[new Random().nextInt(templates.length)];
     }
