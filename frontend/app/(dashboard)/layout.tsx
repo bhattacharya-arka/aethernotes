@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useIsAuthed } from '@/store/useStore';
 import { Sidebar }     from '@/components/layout/Sidebar';
@@ -10,20 +10,23 @@ import { useWebSocket }   from '@/hooks/useWebSocket';
 import { useOfflineSync } from '@/hooks/useOfflineSync';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const isAuthed = useIsAuthed();
-  const router   = useRouter();
+  const isAuthed  = useIsAuthed();
+  const router    = useRouter();
+  const [hydrated, setHydrated] = useState(false);
 
-  // Redirect unauthenticated users
+  useEffect(() => { setHydrated(true); }, []);
+
+  // Only redirect after Zustand has rehydrated from localStorage
   useEffect(() => {
-    if (!isAuthed) router.replace('/login');
-  }, [isAuthed, router]);
+    if (hydrated && !isAuthed) router.replace('/login');
+  }, [isAuthed, router, hydrated]);
 
   // Live WebSocket connection
   useWebSocket();
   // Flush offline mutations on reconnect
   useOfflineSync();
 
-  if (!isAuthed) return null;
+  if (!hydrated || !isAuthed) return null;
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
