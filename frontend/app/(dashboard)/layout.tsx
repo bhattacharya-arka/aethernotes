@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useIsAuthed } from '@/store/useStore';
+import { useIsAuthed, useStore } from '@/store/useStore';
 import { Sidebar }     from '@/components/layout/Sidebar';
 import { CommandPalette } from '@/components/command/CommandPalette';
 import { SearchModal }    from '@/components/search/SearchModal';
@@ -14,7 +14,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router    = useRouter();
   const [hydrated, setHydrated] = useState(false);
 
-  useEffect(() => { setHydrated(true); }, []);
+  // Wait for Zustand persist to finish rehydrating from localStorage
+  // before making any auth decisions.
+  useEffect(() => {
+    if (useStore.persist.hasHydrated()) {
+      setHydrated(true);
+    } else {
+      return useStore.persist.onFinishHydration(() => setHydrated(true));
+    }
+  }, []);
 
   // Only redirect after Zustand has rehydrated from localStorage
   useEffect(() => {
