@@ -61,7 +61,7 @@ public class Note {
      * PostgreSQL tsvector for full-text search on title.
      * Maintained automatically by a DB trigger.
      */
-    @Column(name = "search_vector", insertable = false, updatable = false)
+    @Column(name = "search_vector", columnDefinition = "tsvector", insertable = false, updatable = false)
     private String searchVector;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
