@@ -35,13 +35,18 @@ export function Sidebar() {
   const { data: notesData, isLoading } = useNotes();
   const createNote = useCreateNote();
 
-  const [section, setSection] = useState<NavSection>('all');
+  const [section, setSection]       = useState<NavSection>('all');
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [loggingOut, setLoggingOut] = useState(false);
 
   const notes     = notesData?.content ?? [];
   const favorites = notes.filter(n => n.favorite);
+  const allTags   = [...new Set(notes.flatMap(n => n.tags ?? []))].sort();
 
-  const displayed = section === 'favorites' ? favorites : notes;
+  const displayed =
+    section === 'favorites' ? favorites :
+    section === 'tags' && selectedTag ? notes.filter(n => (n.tags ?? []).includes(selectedTag)) :
+    notes;
 
   const handleCreate = async () => {
     createNote.mutate({
@@ -137,7 +142,7 @@ export function Sidebar() {
           ([key, Icon, label]) => (
             <button
               key={key}
-              onClick={() => setSection(key as NavSection)}
+              onClick={() => { setSection(key as NavSection); setSelectedTag(null); }}
               className={cn(
                 'flex-1 flex items-center justify-center gap-1 py-1 rounded text-xs font-medium transition-colors',
                 section === key
@@ -154,7 +159,7 @@ export function Sidebar() {
 
       <Separator />
 
-      {/* ── Note list ── */}
+      {/* ── Note list / Tag list ── */}
       <ScrollArea className="flex-1">
         {isLoading ? (
           <div className="p-4 space-y-2">
@@ -162,8 +167,36 @@ export function Sidebar() {
               <div key={i} className="h-14 rounded-md bg-muted animate-pulse" />
             ))}
           </div>
+        ) : section === 'tags' && !selectedTag ? (
+          <div className="p-2 space-y-0.5">
+            {allTags.length === 0 ? (
+              <p className="px-2 py-4 text-xs text-muted-foreground text-center">No tags yet</p>
+            ) : allTags.map(tag => (
+              <button
+                key={tag}
+                onClick={() => setSelectedTag(tag)}
+                className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-sm hover:bg-accent text-left"
+              >
+                <Tag className="h-3 w-3 text-muted-foreground shrink-0" />
+                <span className="truncate">{tag}</span>
+                <span className="ml-auto text-xs text-muted-foreground">
+                  {notes.filter(n => (n.tags ?? []).includes(tag)).length}
+                </span>
+              </button>
+            ))}
+          </div>
         ) : (
-          <NoteList notes={displayed} />
+          <>
+            {section === 'tags' && selectedTag && (
+              <button
+                onClick={() => setSelectedTag(null)}
+                className="w-full flex items-center gap-1.5 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground border-b border-border"
+              >
+                <Tag className="h-3 w-3" /> {selectedTag} ×
+              </button>
+            )}
+            <NoteList notes={displayed} />
+          </>
         )}
       </ScrollArea>
 

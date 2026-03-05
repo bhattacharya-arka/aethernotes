@@ -28,7 +28,7 @@ interface Props {
 export function TipTapEditor({
   content,
   onChange,
-  placeholder = 'Start writing…  Type / for commands',
+  placeholder = 'Start writing…',
   editable = true,
   autoSaveMs = 1500,
 }: Props) {
