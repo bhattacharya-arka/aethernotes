@@ -8,7 +8,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+@SpringBootTest(classes = AetherNotesApplication.class)
 @ActiveProfiles("test")
 class AetherNotesApplicationTests {
 
