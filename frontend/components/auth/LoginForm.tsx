@@ -63,6 +63,9 @@ export function LoginForm() {
             type="email"
             placeholder="you@example.com"
             autoComplete="email"
+            autoCorrect="off"
+            autoCapitalize="none"
+            spellCheck={false}
             value={form.email}
             onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
             className={errors.email ? 'border-destructive' : ''}
