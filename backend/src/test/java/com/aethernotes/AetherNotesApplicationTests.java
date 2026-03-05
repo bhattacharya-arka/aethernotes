@@ -1,5 +1,6 @@
 package com.aethernotes;
 
+import com.aethernotes.AetherNotesApplication;
 import com.aethernotes.encryption.EncryptionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
