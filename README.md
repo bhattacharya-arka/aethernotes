@@ -3,23 +3,55 @@
 > A production-grade **encrypted note-taking platform** inspired by Notion, Linear, and Obsidian.
 > Built with **Java 21 + Spring Boot 3** on the backend and **Next.js 14** on the frontend.
 
+**Live:** [aethernotes-self.vercel.app](https://aethernotes-self.vercel.app) · API: [aethernotes-backend.onrender.com](https://aethernotes-backend.onrender.com)
+
+---
+
+## Live Demo
+
+The app is deployed and running in the cloud:
+
+| Service    | URL                                                                                   |
+|------------|---------------------------------------------------------------------------------------|
+| Frontend   | [https://aethernotes-self.vercel.app](https://aethernotes-self.vercel.app)            |
+| Backend    | [https://aethernotes-backend.onrender.com](https://aethernotes-backend.onrender.com) |
+
+**Demo account:**
+
+| Field    | Value                  |
+|----------|------------------------|
+| Email    | `demo@aethernotes.dev` |
+| Password | `Password123!`         |
+
+> **Note:** The backend runs on Render's free tier — the first request after inactivity may take 30–60 seconds to cold-start.
+
+### Cloud Infrastructure
+
+| Layer      | Service                                  |
+|------------|------------------------------------------|
+| Frontend   | [Vercel](https://vercel.com)             |
+| Backend    | [Render](https://render.com)             |
+| Database   | [Supabase](https://supabase.com) (PostgreSQL) |
+| Cache      | [Upstash](https://upstash.com) (Redis)   |
+
 ---
 
 ## Table of Contents
 
-1. [Features](#features)
-2. [Architecture](#architecture)
-3. [Technology Stack](#technology-stack)
-4. [Encryption Design](#encryption-design)
-5. [Setup — Docker (recommended for macOS/Linux)](#setup--docker-recommended-for-macoslinux)
-6. [Setup — Windows (native, no Docker)](#setup--windows-native-no-docker)
-7. [Setup — macOS (native, no Docker)](#setup--macos-native-no-docker)
-8. [Environment Variables](#environment-variables)
-9. [Seed Data & Demo Account](#seed-data--demo-account)
-10. [API Reference](#api-reference)
-11. [Project Structure](#project-structure)
-12. [Known Caveats](#known-caveats)
-13. [Development Tips](#development-tips)
+1. [Live Demo](#live-demo)
+2. [Features](#features)
+3. [Architecture](#architecture)
+4. [Technology Stack](#technology-stack)
+5. [Encryption Design](#encryption-design)
+6. [Setup — Docker (recommended for macOS/Linux)](#setup--docker-recommended-for-macoslinux)
+7. [Setup — Windows (native, no Docker)](#setup--windows-native-no-docker)
+8. [Setup — macOS (native, no Docker)](#setup--macos-native-no-docker)
+9. [Environment Variables](#environment-variables)
+10. [Seed Data & Demo Account](#seed-data--demo-account)
+11. [API Reference](#api-reference)
+12. [Project Structure](#project-structure)
+13. [Known Caveats](#known-caveats)
+14. [Development Tips](#development-tips)
 
 ---
 
@@ -135,10 +167,10 @@
 
 ### Infrastructure
 
-| Service    | Docker image             | Purpose                                    |
-|------------|--------------------------|--------------------------------------------|
-| PostgreSQL | `postgres:16-alpine`     | Primary data store, full-text search index |
-| Redis      | `redis:7-alpine`         | Encryption key sessions, JWT blacklist     |
+| Service    | Local (Docker)           | Cloud (deployed)    | Purpose                                    |
+|------------|--------------------------|---------------------|--------------------------------------------|
+| PostgreSQL | `postgres:16-alpine`     | Supabase            | Primary data store, full-text search index |
+| Redis      | `redis:7-alpine`         | Upstash             | Encryption key sessions, JWT blacklist     |
 
 ---
 
@@ -505,7 +537,7 @@ GET /api/tags   → Tag[]
 
 ### WebSocket
 
-Connect: `ws://localhost:8080/ws` (SockJS endpoint).
+Connect: `ws://localhost:8080/ws` (local) or `wss://aethernotes-backend.onrender.com/ws` (production) — SockJS endpoint.
 
 Subscribe: `/topic/notes/{userId}` — receives a `NoteResponse` JSON payload on every create/update.
 
