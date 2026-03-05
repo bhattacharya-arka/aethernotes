@@ -23,11 +23,13 @@ http.interceptors.request.use(config => {
   return config;
 });
 
-// On 401 → clear session and redirect to login
+// On 401 → clear session and redirect to login (skip for auth endpoints)
 http.interceptors.response.use(
   res => res,
   (err: AxiosError) => {
-    if (err.response?.status === 401 && typeof window !== 'undefined') {
+    const url = err.config?.url ?? '';
+    const isAuthEndpoint = url.includes('/api/auth/');
+    if (err.response?.status === 401 && !isAuthEndpoint && typeof window !== 'undefined') {
       localStorage.removeItem('access_token');
       localStorage.removeItem('aethernotes-store');
       window.location.href = '/login';
