@@ -43,7 +43,8 @@ export function stripMarkdown(md: string): string {
     .trim();
 }
 
-export function debounce<T extends (...args: unknown[]) => void>(fn: T, ms: number) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function debounce<T extends (...args: any[]) => void>(fn: T, ms: number) {
   let timer: ReturnType<typeof setTimeout>;
   return (...args: Parameters<T>) => {
     clearTimeout(timer);
