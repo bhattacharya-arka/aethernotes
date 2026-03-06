@@ -11,7 +11,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
 export const http = axios.create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
-  timeout: 15_000,
+  timeout: 90_000, // 90s — accommodates Render free tier cold start (can take 30–60s)
 });
 
 // Attach JWT from localStorage on every request
