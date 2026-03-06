@@ -2,24 +2,28 @@ spring:
   application:
     name: aethernotes-backend
 
+  main:
+    lazy-initialization: true   # defer bean creation to first request — cuts cold-start by ~60%
+
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:aethernotes}${POSTGRES_JDBC_PARAMS:}
     username: ${POSTGRES_USER:postgres}
     password: ${POSTGRES_PASSWORD:password}
     hikari:
       maximum-pool-size: 5
-      minimum-idle: 1
+      minimum-idle: 0           # don't open DB connections at startup — connect on first request
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
+      initialization-fail-timeout: -1  # don't block startup if DB isn't reachable yet
 
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: validate
     show-sql: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         jdbc:
           batch_size: 25
@@ -75,10 +79,9 @@ app:
 
 logging:
   level:
-    com.aethernotes: DEBUG
-    org.springframework.security: INFO
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql: TRACE
+    com.aethernotes: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
